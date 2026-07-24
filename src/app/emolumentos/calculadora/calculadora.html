@@ -1,0 +1,39 @@
+<h2>Teste da API</h2>
+
+<label>
+  Tipo:
+  <select [ngModel]="tipo()" (ngModelChange)="tipo.set($event)">
+    <option value="compra_e_venda">Compra e venda</option>
+    <option value="doacao">Doação</option>
+    <option value="sem_valor">Sem valor</option>
+    <option value="procuracao">Procuração</option>
+  </select>
+</label>
+
+<br /><br />
+
+<label>
+  Valor:
+  <input [ngModel]="valor()" (ngModelChange)="valor.set($event)" />
+</label>
+
+<br /><br />
+
+<button (click)="calcular()" [disabled]="carregando()">
+  {{ carregando() ? 'Calculando...' : 'Calcular' }}
+</button>
+
+<br /><br />
+
+@if (erro()) {
+  <p style="color: red;">{{ erro() }}</p>
+}
+
+@if (resultado(); as r) {
+  <h3>Total: {{ r.total_brl }}</h3>
+  <ul>
+    @for (c of r.componentes; track c.nome) {
+      <li>{{ c.nome }}: {{ c.valor_brl }}</li>
+    }
+  </ul>
+}
