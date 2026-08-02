@@ -1,7 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EmolumentosService } from '../emolumentos.service';
-import { CalculoRequest, CalculoResponse, TipoAto, ValorMonetario } from '../../emolumentos/emolumentos.models';
+import {
+  CalculoRequest,
+  CalculoResponse,
+  TipoAto,
+  ValorMonetario,
+} from '../../emolumentos/emolumentos.models';
 
 export interface CalculoItemUI {
   id: string;
@@ -32,7 +37,9 @@ export class Calculadora {
   starTipOpen = signal(false);
 
   // --- CONTROLE DINÂMICO ---
-  mostraValores = computed(() => ['compra_e_venda', 'doacao', 'partilha', 'cessao_direitos'].includes(this.tipo()));
+  mostraValores = computed(() =>
+    ['compra_e_venda', 'doacao', 'partilha', 'cessao_direitos'].includes(this.tipo()),
+  );
   mostraUsufruto = computed(() => this.tipo() === 'doacao');
   mostraPartes = computed(() => this.tipo() === 'procuracao');
 
@@ -86,7 +93,10 @@ export class Calculadora {
     // "Inventário/Divórcio" é um rótulo de UX — por trás, a fórmula é
     // idêntica à compra e venda (a regra 100%/80% já é automática para
     // qualquer tipo com 2+ bens). Traduz antes de mandar pra API.
-    const tipoParaApi = this.tipo() === 'partilha' || this.tipo() === 'cessao_direitos' ? 'compra_e_venda' : this.tipo();
+    const tipoParaApi =
+      this.tipo() === 'partilha' || this.tipo() === 'cessao_direitos'
+        ? 'compra_e_venda'
+        : this.tipo();
 
     const request: CalculoRequest = {
       tipo: tipoParaApi as TipoAto,
@@ -217,5 +227,27 @@ export class Calculadora {
     if (this.resultado()) return { text: '#1b7a52', dot: '#1b8a5b' };
     return { text: '#8a8478', dot: '#c9c3b8' };
   }
-}
 
+  // --- Tooltips das colunas ---
+
+  explicacoesColunas: Record<string, string> = {
+    Emolumentos: 'Taxa cobrada pelo cartório pelo ato praticado, com base no valor do bem.',
+    Funrejus: 'Fundo de Reequipamento do Judiciário — taxa estadual sobre o valor do ato.',
+    Selo: 'Taxa de segurança do documento (papel + traslado).',
+    Distribuidor: 'Taxa fixa cobrada uma vez por escritura, independente do número de bens.',
+    Folha: 'Taxa adicional por página do documento (quando aplicável).',
+    FUNDEP: 'Fundo de Desenvolvimento — 5% sobre o valor dos emolumentos.',
+    ISSQN: 'Imposto Sobre Serviços — 5% sobre o valor dos emolumentos, destinado ao município.',
+    VRC: 'Valor de Referência de Custas — unidade usada para indexar as taxas (1 VRC = R$ 0,277).',
+  };
+
+  tooltipAberto = signal<string | null>(null);
+
+  toggleTooltip(coluna: string) {
+    this.tooltipAberto.update((atual) => (atual === coluna ? null : coluna));
+  }
+
+  fecharTooltip() {
+    this.tooltipAberto.set(null);
+  }
+}
