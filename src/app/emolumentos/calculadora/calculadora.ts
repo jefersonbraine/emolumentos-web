@@ -14,6 +14,7 @@ export interface CalculoItemUI {
   standalone: true,
   imports: [FormsModule],
   templateUrl: './calculadora.html',
+  styleUrl: './calculadora.css',
 })
 export class Calculadora {
   private service = inject(EmolumentosService);
@@ -28,6 +29,7 @@ export class Calculadora {
   resultado = signal<CalculoResponse | null>(null);
   erro = signal<string | null>(null);
   carregando = signal(false);
+  starTipOpen = signal(false);
 
   // --- CONTROLE DINÂMICO ---
   mostraValores = computed(() => ['compra_e_venda', 'doacao'].includes(this.tipo()));
