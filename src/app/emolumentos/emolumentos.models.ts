@@ -1,21 +1,46 @@
+// emolumentos.models.ts
 export type TipoAto = 'compra_e_venda' | 'doacao' | 'sem_valor' | 'procuracao';
 
 export interface CalculoRequest {
   tipo: TipoAto;
-  valores: string[];          // ["30000", "20000"] — sempre string
-  usufruto?: boolean;         // só é relevante na doacao
-  partes_adicionais?: number; // só é relevante na procuracao
+  valores: string[];
+  usufruto?: boolean;
+  partes_adicionais?: number;
 }
 
-export interface Componente {
-  nome: string;               // "Emolumentos", "Funrejus", ...
-  valor: string;              // "1377.24" — Decimal exato como string
-  valor_brl: string;          // "R$ 1.377,24" — já formatado
+// Representa a estrutura de moeda devolvida pela API
+export interface ValorMonetario {
+  raw: string;
+  brl: string;
+}
+
+// Representa cada imóvel individualmente retornado na array "itens"
+export interface ItemCalculado {
+  descricao: string;
+  valor_base?: ValorMonetario;
+  emolumentos?: ValorMonetario;
+  funrejus?: ValorMonetario;
+  fundep?: ValorMonetario;
+  issqn?: ValorMonetario;
+  total?: ValorMonetario;
+}
+
+// Representa a consolidação das taxas retornada no "total_geral"
+export interface TotalGeral {
+  valor_base?: ValorMonetario;
+  emolumentos?: ValorMonetario;
+  funrejus?: ValorMonetario;
+  selo?: ValorMonetario;
+  distribuidor?: ValorMonetario;
+  folha?: ValorMonetario;
+  fundep?: ValorMonetario;
+  issqn?: ValorMonetario;
+  vrc?: ValorMonetario;
+  total?: ValorMonetario;
 }
 
 export interface CalculoResponse {
   tipo: string;
-  componentes: Componente[];
-  total: string;               // "1377.24" — Decimal exato como string
-  total_brl: string;           // "R$ 1.377,24" — já formatado
+  itens: ItemCalculado[];
+  total_geral: TotalGeral;
 }

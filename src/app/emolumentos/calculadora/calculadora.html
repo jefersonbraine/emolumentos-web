@@ -1,39 +1,242 @@
-<h2>Teste da API</h2>
+<div style="min-height:100vh; background:var(--bg-body, #faf9f7); color:var(--text-main, #1a1a1a); font-family:'Instrument Sans', system-ui, sans-serif; font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased;">
 
-<label>
-  Tipo:
-  <select [ngModel]="tipo()" (ngModelChange)="tipo.set($event)">
-    <option value="compra_e_venda">Compra e venda</option>
-    <option value="doacao">Doação</option>
-    <option value="sem_valor">Sem valor</option>
-    <option value="procuracao">Procuração</option>
-  </select>
-</label>
+  <!-- NAVBAR -->
+  <!-- <nav data-noprint style="position:sticky; top:0; z-index:30; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 40px; background:rgba(250,249,247,.82); backdrop-filter:saturate(1.2) blur(10px); border-bottom:1px solid #ecece8;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="display:flex; flex-direction:column; gap:2px; line-height:1;">
+        <span style="font-size:15px; font-weight:700; letter-spacing:-.01em;">Emolumentos PR</span>
+        <span style="font-size:11px; font-weight:500; color:#8a8478;">Cálculo oficial de custas · Paraná</span>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="#" class="cc-navlink" style="font-size:13.5px; font-weight:500; color:#8a8478;">Sobre as taxas</a>
+    </div>
+  </nav> -->
 
-<br /><br />
+  <!-- HEADER -->
+  <header style="position:relative; overflow:hidden; border-bottom:1px solid #ecece8; background:radial-gradient(720px 340px at 78% -30%, rgba(26,26,26,.05), transparent 60%);">
+    <div style="max-width:1120px; margin:0 auto; padding:60px 40px 52px;">
+      <h1 style="margin:0 0 16px; max-width:720px; font-size:52px; line-height:1.03; letter-spacing:-.03em; font-weight:700; color:#161412;">
+        Saiba exatamente o que você paga na escritura.
+      </h1>
+      <p style="margin:0 0 10px; max-width:560px; font-size:17px; line-height:1.6; color:#6f6a60;">
+        Escolha a natureza do ato, informe os valores e veja o total decomposto <strong style="font-weight:600; color:#4a453d;">taxa por taxa</strong> — antes de assinar. Cálculo pela API oficial de emolumentos do Paraná.
+      </p>
+    </div>
+  </header>
 
-<label>
-  Valor:
-  <input [ngModel]="valor()" (ngModelChange)="valor.set($event)" />
-</label>
+  <main style="max-width:1120px; margin:0 auto; padding:0px 40px 40px;">
 
-<br /><br />
+    <!-- SEÇÃO 1: NATUREZA DO ATO -->
+    <section style="margin-bottom:34px; display:flex; flex-wrap:wrap; gap:26px; align-items:flex-end;">
+      <div style="max-width:420px; flex:1; min-width:280px;">
+        <label style="display:block; font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:#8a8478; margin-bottom:10px;">
+          Natureza do ato
+        </label>
+        <div style="position:relative;">
+          <select
+            [(ngModel)]="tipo"
+            (change)="erro.set(null)"
+            class="cc-inp"
+            style="appearance:none; width:100%; padding:14px 44px 14px 16px; font-family:inherit; font-size:15px; color:#1a1a1a; background:#fff; border:1px solid #e4e1db; border-radius:12px; cursor:pointer;">
+            <option value="compra_e_venda">Compra e venda</option>
+            <option value="doacao">Doação</option>
+            <option value="sem_valor">Escritura sem valor declarado</option>
+            <option value="procuracao">Procuração</option>
+          </select>
+          <span style="position:absolute; right:16px; top:50%; transform:translateY(-50%); pointer-events:none; color:#8a8478; font-size:12px;">▾</span>
+        </div>
+      </div>
 
-<button (click)="calcular()" [disabled]="carregando()">
-  {{ carregando() ? 'Calculando...' : 'Calcular' }}
-</button>
+      @if (mostraUsufruto()) {
+        <div>
+          <label style="display:flex; align-items:center; gap:11px; cursor:pointer; font-size:14.5px; color:#2a2620; padding-bottom:14px;">
+            <input
+              type="checkbox"
+              [(ngModel)]="usufruto"
+              (change)="erro.set(null)"
+              style="width:18px; height:18px; accent-color:#1a1a1a; cursor:pointer;">
+            Com reserva de usufruto
+          </label>
+        </div>
+      }
 
-<br /><br />
+      @if (mostraPartes()) {
+        <div style="width:200px;">
+          <label style="display:block; font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:#8a8478; margin-bottom:10px;">
+            Partes adicionais
+          </label>
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="partesAdicionais"
+            (input)="erro.set(null)"
+            class="cc-inp"
+            style="width:100%; padding:14px 16px; font-family:inherit; font-size:15px; color:#1a1a1a; background:#fff; border:1px solid #e4e1db; border-radius:12px;">
+        </div>
+      }
+    </section>
 
-@if (erro()) {
-  <p style="color: red;">{{ erro() }}</p>
-}
+    <!-- SEÇÃO 2: ESTIMATIVA LOCAL (VALORES DO ATO) -->
+    @if (mostraValores()) {
+      <section>
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:14px; gap:16px;">
+          <span style="font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:#8a8478;">
+            Valores do ato
+          </span>
+          <button data-noprint (click)="adicionarItem()" class="cc-btn cc-ghost" style="display:inline-flex; align-items:center; gap:7px; padding:9px 15px; font-family:inherit; font-size:13.5px; font-weight:500; color:#1a1a1a; background:#fff; border:1px solid #e4e1db; border-radius:10px; cursor:pointer;">
+            <span style="font-size:15px; line-height:1;">+</span> Adicionar imóvel
+          </button>
+        </div>
 
-@if (resultado(); as r) {
-  <h3>Total: {{ r.total_brl }}</h3>
-  <ul>
-    @for (c of r.componentes; track c.nome) {
-      <li>{{ c.nome }}: {{ c.valor_brl }}</li>
+        <div style="border:1px solid #e8e5df; border-radius:16px; background:#fff; overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:14px; min-width:900px;">
+            <thead>
+              <tr style="border-bottom:1px solid #ecece8;">
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:left;">Descrição</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:left;">Vl. Base</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">Emolumentos</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">Funrejus</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">Selo</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">Distribuidor</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">Folha</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">FUNDEP</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">ISSQN</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">VRC</th>
+                <th style="padding:15px 14px; font-weight:500; font-size:12.5px; color:#8a8478; text-align:right;">Total</th>
+                <th data-noprint style="width:46px;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of itens(); track item.id; let isLast = $last) {
+                <tr class="cc-row" [style.border-bottom]="isLast ? 'none' : '1px solid #f2f0ec'">
+                  <td style="padding:10px 14px;">
+                    <input
+                      [(ngModel)]="item.desc"
+                      (ngModelChange)="erro.set(null)"
+                      name="desc_{{item.id}}"
+                      class="cc-inp"
+                      style="width:150px; padding:9px 11px; font-family:inherit; font-size:14px; color:#1a1a1a; background:#fff; border:1px solid #e4e1db; border-radius:9px;">
+                  </td>
+                  <td style="padding:10px 14px;">
+                    <div style="display:flex; align-items:center; width:150px; padding:0 11px; background:#fff; border:1px solid #e4e1db; border-radius:9px;">
+                      <span style="font-size:13px; color:#a49e92; margin-right:6px;">R$</span>
+                      <input
+                        [ngModel]="item.baseStr"
+                        (ngModelChange)="onValorChange(item, $event)"
+                        name="base_{{item.id}}"
+                        inputmode="numeric"
+                        placeholder="0,00"
+                        style="flex:1; min-width:0; padding:9px 0; font-family:inherit; font-size:14px; text-align:right; color:#1a1a1a; background:transparent; border:none; outline:none; font-variant-numeric:tabular-nums;">
+                    </div>
+                  </td>
+                  <td style="padding:10px 14px; text-align:right; color:#4a453d;">{{ estimativaLocal(item).emol }}</td>
+                  <td style="padding:10px 14px; text-align:right; color:#4a453d;">{{ estimativaLocal(item).funrejus }}</td>
+                  <td style="padding:10px 14px; text-align:right; color:#4a453d;">{{ estimativaLocal(item).selo }}</td>
+                  <td style="padding:10px 14px; text-align:right; color:#4a453d;">{{ estimativaLocal(item).distrib }}</td>
+                  <td style="padding:10px 14px; text-align:right; color:#4a453d;">{{ estimativaLocal(item).folha }}</td>
+                  <td style="padding:10px 14px; text-align:right; color:#4a453d;">{{ estimativaLocal(item).fundep }}</td>
+                  <td style="padding:10px 14px; text-align:right; color:#4a453d;">{{ estimativaLocal(item).issqn }}</td>
+                  <td style="padding:10px 14px; text-align:right; color:#a49e92;">{{ estimativaLocal(item).vrc }}</td>
+                  <td style="padding:10px 14px; text-align:right; font-weight:600; color:#1a1a1a;">{{ estimativaLocal(item).total }}</td>
+                  <td data-noprint style="padding:10px 14px; text-align:center;">
+                    <button (click)="removerItem(item.id)" class="cc-btn cc-x" title="Remover" style="width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; color:#b8b2a8; background:transparent; border:none; border-radius:8px; cursor:pointer; font-size:15px;">✕</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <p data-noprint style="margin:12px 2px 0; font-size:12.5px; color:#a49e92; line-height:1.5;">
+          As colunas por imóvel são uma estimativa local para conferência. O <strong style="font-weight:600; color:#8a8478;">Total geral</strong> abaixo é o cálculo oficial da API (Distribuidor uma vez, Selo por traslado).
+        </p>
+      </section>
     }
-  </ul>
-}
+
+    <!-- ACIONADOR DE CALCULO E MENSAGEM DE ERRO -->
+    <div style="margin-top: 24px;">
+      @if (!carregando()) {
+        <button (click)="calcular()" class="cc-btn cc-solid" style="display:inline-flex; align-items:center; gap:8px; padding:11px 18px; font-family:inherit; font-size:14px; font-weight:600; color:#fff; background:#1a1a1a; border:none; border-radius:11px; cursor:pointer;">
+          {{ resultado() ? 'Recalcular Emolumentos' : 'Processar Cálculo' }}
+        </button>
+      } @else {
+        <button disabled class="cc-btn cc-solid" style="display:inline-flex; align-items:center; gap:8px; padding:11px 18px; font-family:inherit; font-size:14px; font-weight:600; color:#fff; background:#1a1a1a; border:none; border-radius:11px; opacity:0.7; cursor:not-allowed;">
+          Processando...
+        </button>
+      }
+
+      @if (erro()) {
+        <div style="margin-top: 16px; padding: 12px 16px; background: #faf0ee; color: #c0392b; border-radius: 12px; font-size: 14px;">
+          <strong>Atenção:</strong> {{ erro() }}
+        </div>
+      }
+    </div>
+
+    <!-- SEÇÃO 3: TOTAL GERAL OFICIAL (API) -->
+    <section style="margin-top:40px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;">
+        <span style="font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:#8a8478;">Total geral</span>
+        <span title="Fonte dos valores" style="display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:500; color:{{ getStatusColor().text }};">
+          <span style="width:7px; height:7px; border-radius:50%; background:{{ getStatusColor().dot }};"></span>{{ getStatusLabel() }}
+        </span>
+      </div>
+      <div style="border:1px solid #e8e5df; border-radius:16px; overflow:hidden; background:#fff; overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:14px; min-width:820px;">
+          <thead>
+            <tr style="background:#f6f4f1;">
+              <th style="padding:14px 16px; text-align:left; font-weight:500; font-size:12.5px; color:#8a8478;">Valor Base</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">Emolumentos</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">Funrejus</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">Selo</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">Distribuidor</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">Folha</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">FUNDEP</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">ISSQN</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">VRC</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:600; font-size:12.5px; color:#1a1a1a; background:#dad7d2;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:18px 16px; text-align:left; color:#4a453d;">{{ getBaseTotal() }}</td>
+              <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('Emolumentos') }}</td>
+              <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('Funrejus') }}</td>
+              <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('Selo') }}</td>
+              <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('Distribuidor') }}</td>
+              <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('Folha') }}</td>
+              <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('FUNDEP') }}</td>
+              <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('ISSQN') }}</td>
+              <td style="padding:18px 16px; text-align:right; color:#a49e92;">{{ getValorApi('VRC') }}</td>
+              <td style="padding:18px 16px; text-align:right; font-weight:700; font-size:16px; color:#1a1a1a; background:#dad7d2; white-space:nowrap;">
+                {{ getTotalFinal() }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- BOTÕES DE AÇÃO -->
+      <div data-noprint style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px;">
+        <button class="cc-btn cc-solid" style="display:inline-flex; align-items:center; gap:8px; padding:11px 18px; font-family:inherit; font-size:14px; font-weight:600; color:#fff; background:#1a1a1a; border:none; border-radius:11px; cursor:pointer;">
+          Salvar cálculo
+        </button>
+        <button class="cc-btn cc-ghost" style="display:inline-flex; align-items:center; gap:8px; padding:11px 18px; font-family:inherit; font-size:14px; font-weight:500; color:#1a1a1a; background:#fff; border:1px solid #e4e1db; border-radius:11px; cursor:pointer;">
+          Copiar resultado
+        </button>
+        <button class="cc-btn cc-ghost" style="display:inline-flex; align-items:center; gap:8px; padding:11px 18px; font-family:inherit; font-size:14px; font-weight:500; color:#1a1a1a; background:#fff; border:1px solid #e4e1db; border-radius:11px; cursor:pointer;" onclick="window.print()">
+          Exportar PDF
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer data-noprint style="border-top:1px solid #ecece8; margin-top:20px;">
+    <div style="max-width:1120px; margin:0 auto; padding:22px 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:13px; color:#8a8478;">
+      <span>Desenvolvido por <strong style="color:#4a453d; font-weight:600;">Jeferson Braine Leal</strong> — Substituto Legal no Paraná</span>
+      <span style="display:inline-flex; gap:18px;"><a href="https://github.com/jefersonbraine/emolumentos-pr" target="_blank" rel="noopener noreferrer">emolumentos-pr</a><a href="https://github.com/jefersonbraine/emolumentos-api" target="_blank" rel="noopener noreferrer">emolumentos-api</a></span>
+    </div>
+  </footer>
+
+</div>
