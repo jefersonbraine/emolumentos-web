@@ -32,7 +32,7 @@ export class Calculadora {
   starTipOpen = signal(false);
 
   // --- CONTROLE DINÂMICO ---
-  mostraValores = computed(() => ['compra_e_venda', 'doacao'].includes(this.tipo()));
+  mostraValores = computed(() => ['compra_e_venda', 'doacao', 'partilha'].includes(this.tipo()));
   mostraUsufruto = computed(() => this.tipo() === 'doacao');
   mostraPartes = computed(() => this.tipo() === 'procuracao');
 
@@ -160,7 +160,9 @@ export class Calculadora {
   estimativaLocal(item: CalculoItemUI) {
     const limpa = (v?: ValorMonetario) => (v?.brl ? v.brl.replace('R$ ', '').trim() : '0,00');
     const res = this.resultado();
-    const apiItem = res?.itens?.find((i) => i.descricao === item.desc);
+
+    const indice = this.itens().findIndex((i) => i.id === item.id);
+    const apiItem = res?.itens?.[indice];
 
     if (!apiItem) {
       return {
@@ -188,6 +190,7 @@ export class Calculadora {
       total: limpa(apiItem.total),
     };
   }
+
   getStatusLabel(): string {
     if (this.carregando()) return 'Calculando...';
     if (this.erro()) return 'API Indisponível';
