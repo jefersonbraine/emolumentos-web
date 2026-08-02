@@ -1,0 +1,85 @@
+/* calculadora.css */
+.calc-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 44px 40px 40px;
+}
+
+.calc-header {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-light);
+  background: radial-gradient(720px 340px at 78% -30%, rgba(26,26,26,.05), transparent 60%);
+}
+
+.calc-header-content {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 60px 40px 52px;
+}
+
+.calc-title {
+  margin: 0 0 16px;
+  max-width: 720px;
+  font-size: 52px;
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: #161412;
+}
+
+.calc-subtitle {
+  margin: 0 0 26px;
+  max-width: 560px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #6f6a60;
+}
+
+/* Tabela de Emolumentos */
+.table-wrapper {
+  border: 1px solid #e8e5df;
+  border-radius: 16px;
+  background: var(--bg-surface);
+  overflow-x: auto;
+}
+
+.emol-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 900px;
+}
+
+.emol-table th {
+  padding: 15px 14px;
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.emol-table tr.cc-row {
+  border-bottom: 1px solid #f2f0ec;
+}
+
+.emol-table tr.cc-row:hover {
+  background: var(--bg-body);
+}
+
+.emol-table td {
+  padding: 10px 14px;
+  color: var(--text-secondary);
+}
+
+.btn-remove:hover {
+  color: var(--text-danger) !important;
+  background: var(--hover-danger) !important;
+}
+
+.totals-row {
+  background: #efece7;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-main);
+}

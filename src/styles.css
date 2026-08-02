@@ -1,1 +1,82 @@
 /* You can add global styles to this file, and also import other style files */
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
+
+:root {
+  /* Paleta de Cores */
+  --bg-body: #f0eae9;
+  --bg-surface: #ffffff;
+  --bg-header: rgba(250, 249, 247, 0.82);
+  --text-main: #1a1a1a;
+  --text-secondary: #4a453d;
+  --text-muted: #8a8478;
+  --border-light: #ecece8;
+  --border-input: #e4e1db;
+
+  /* Interações */
+  --hover-ghost: #f4f2ef;
+  --hover-danger: #faf0ee;
+  --text-danger: #c0392b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-body);
+  color: var(--text-main);
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--text-main);
+  color: #fff;
+}
+
+a {
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.6;
+}
+
+/* Utilitários Globais de Formulário e Botões */
+.cc-inp {
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.cc-inp:focus {
+  outline: none;
+  border-color: var(--text-main) !important;
+  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1) !important;
+}
+
+.cc-btn {
+  transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s, transform 0.05s;
+}
+
+.cc-btn:active {
+  transform: translateY(1px);
+}
+
+.cc-ghost:hover {
+  background: var(--hover-ghost) !important;
+}
+
+.cc-solid:hover {
+  opacity: 0.88;
+}
+
+/* Ocultar elementos na impressão */
+@media print {
+  [data-noprint] { display: none !important; }
+  body { background: #fff !important; }
+}
