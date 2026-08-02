@@ -32,7 +32,7 @@ export class Calculadora {
   starTipOpen = signal(false);
 
   // --- CONTROLE DINÂMICO ---
-  mostraValores = computed(() => ['compra_e_venda', 'doacao', 'partilha'].includes(this.tipo()));
+  mostraValores = computed(() => ['compra_e_venda', 'doacao', 'partilha', 'cessao_direitos'].includes(this.tipo()));
   mostraUsufruto = computed(() => this.tipo() === 'doacao');
   mostraPartes = computed(() => this.tipo() === 'procuracao');
 
@@ -75,18 +75,21 @@ export class Calculadora {
   // --- INTEGRAÇÃO COM A API ---
   calcular() {
     this.erro.set(null);
-
     this.carregando.set(true);
 
-    // ATUALIZADO: Remove os pontos de milhar e troca vírgula por ponto para a API
     const valoresProcessados: string[] = this.mostraValores()
       ? this.itens()
           .map((i) => i.baseStr.replace(/\./g, '').replace(',', '.'))
           .filter((v) => v !== '' && Number(v) > 0)
       : [];
 
+    // "Inventário/Divórcio" é um rótulo de UX — por trás, a fórmula é
+    // idêntica à compra e venda (a regra 100%/80% já é automática para
+    // qualquer tipo com 2+ bens). Traduz antes de mandar pra API.
+    const tipoParaApi = this.tipo() === 'partilha' || this.tipo() === 'cessao_direitos' ? 'compra_e_venda' : this.tipo();
+
     const request: CalculoRequest = {
-      tipo: this.tipo(),
+      tipo: tipoParaApi as TipoAto,
       valores: valoresProcessados,
     };
 
@@ -96,6 +99,16 @@ export class Calculadora {
     this.service.calcular(request).subscribe({
       next: (res) => {
         this.resultado.set(res);
+
+        if (res.itens?.length && res.itens.length > 1) {
+          const valorNumerico = (item: CalculoItemUI) =>
+            parseFloat(item.baseStr.replace(/\./g, '').replace(',', '.')) || 0;
+
+          this.itens.update((itensAtuais) =>
+            [...itensAtuais].sort((a, b) => valorNumerico(b) - valorNumerico(a)),
+          );
+        }
+
         this.carregando.set(false);
       },
       error: (err) => {

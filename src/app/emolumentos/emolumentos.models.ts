@@ -1,5 +1,5 @@
 // emolumentos.models.ts
-export type TipoAto = 'compra_e_venda' | 'doacao' | 'sem_valor' | 'procuracao';
+export type TipoAto = 'compra_e_venda' | 'doacao' | 'sem_valor' | 'procuracao' | 'partilha' | 'cessao_direitos';
 
 export interface CalculoRequest {
   tipo: TipoAto;
