@@ -1,34 +1,46 @@
-<div style="min-height:100vh; background:var(--bg-body, #faf9f7); color:var(--text-main, #1a1a1a); font-family:'Instrument Sans', system-ui, sans-serif; font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased;">
+<div class="calc-bg-texture" style="position:relative; z-index:0; min-height:100vh; color:var(--text-main, #1a1a1a); font-family:'Instrument Sans', system-ui, sans-serif; font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased;">
 
-  <!-- NAVBAR -->
-  <!-- <nav data-noprint style="position:sticky; top:0; z-index:30; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 40px; background:rgba(250,249,247,.82); backdrop-filter:saturate(1.2) blur(10px); border-bottom:1px solid #ecece8;">
-    <div style="display:flex; align-items:center; gap:12px;">
-      <div style="display:flex; flex-direction:column; gap:2px; line-height:1;">
-        <span style="font-size:15px; font-weight:700; letter-spacing:-.01em;">Emolumentos PR</span>
-        <span style="font-size:11px; font-weight:500; color:#8a8478;">Cálculo oficial de custas · Paraná</span>
-      </div>
-    </div>
-    <div style="display:flex; align-items:center; gap:20px;">
-      <a href="#" class="cc-navlink" style="font-size:13.5px; font-weight:500; color:#8a8478;">Sobre as taxas</a>
-    </div>
-  </nav> -->
+<div class="footer-araucarias" aria-hidden="true"></div>
 
   <!-- HEADER -->
-  <header style="position:relative; overflow:hidden; border-bottom:1px solid #ecece8; background:radial-gradient(720px 340px at 78% -30%, rgba(26,26,26,.05), transparent 60%);">
-    <div style="max-width:1120px; margin:0 auto; padding:60px 40px 52px;">
-      <h1 style="margin:0 0 16px; max-width:720px; font-size:52px; line-height:1.03; letter-spacing:-.03em; font-weight:700; color:#161412;">
-        Saiba exatamente o que você paga na escritura.
-      </h1>
-      <p style="margin:0 0 10px; max-width:560px; font-size:17px; line-height:1.6; color:#6f6a60;">
-        Escolha a natureza do ato, informe os valores e veja o total decomposto <strong style="font-weight:600; color:#4a453d;">taxa por taxa</strong> — antes de assinar. Cálculo pela API oficial de emolumentos do Paraná.
-      </p>
+<header style="position:relative; overflow:hidden;  background:radial-gradient(720px 340px at 78% -30%, rgba(26,26,26,.05), transparent 60%);">
+
+  <div style="position:relative; max-width:1120px; margin:0 auto; padding:30px 40px 52px;">
+
+    <!-- Mapa PR decorativo + estrela -->
+    <div class="pr-map-wrap">
+      <div class="pr-map-inner">
+        <img src="/pr-outline.png" class="pr-outline" alt="" />
+        <button
+          class="pr-star"
+          style="top:56%; left:81%;"
+          (click)="starTipOpen.set(!starTipOpen())"
+          [attr.aria-expanded]="starTipOpen()"
+          aria-label="Cerro Azul, PR — onde este projeto surgiu"
+          type="button">
+          <span class="pr-star__ring"></span>
+          <img src="/sparkle.png" class="pr-star__dot" alt="" />
+          @if (starTipOpen()) {
+            <span class="pr-star__tip"><strong>Cerro Azul, PR</strong><br>Onde este projeto surgiu.</span>
+          }
+        </button>
+      </div>
     </div>
-  </header>
+
+    <h1 style="position:relative; z-index:1; margin:0 0 16px; max-width:720px; font-size:52px; line-height:1.03; letter-spacing:-.03em; font-weight:700; color:#161412;">
+      Saiba exatamente o que você paga na escritura.
+    </h1>
+
+    <p style="position:relative; z-index:1; margin:0 0 10px; max-width:560px; font-size:17px; line-height:1.6; color:#6f6a60;">
+      Escolha a natureza do ato, informe os valores e veja o total decomposto <strong style="font-weight:600; color:#4a453d;">taxa por taxa</strong> — antes de assinar. Cálculo pela API oficial de emolumentos do Paraná.
+    </p>
+  </div>
+</header>
 
   <main style="max-width:1120px; margin:0 auto; padding:0px 40px 40px;">
 
     <!-- SEÇÃO 1: NATUREZA DO ATO -->
-    <section style="margin-bottom:34px; display:flex; flex-wrap:wrap; gap:26px; align-items:flex-end;">
+    <section style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:26px; align-items:flex-end;">
       <div style="max-width:420px; flex:1; min-width:280px;">
         <label style="display:block; font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:#8a8478; margin-bottom:10px;">
           Natureza do ato
@@ -38,7 +50,7 @@
             [(ngModel)]="tipo"
             (change)="erro.set(null)"
             class="cc-inp"
-            style="appearance:none; width:100%; padding:14px 44px 14px 16px; font-family:inherit; font-size:15px; color:#1a1a1a; background:#fff; border:1px solid #e4e1db; border-radius:12px; cursor:pointer;">
+            style="appearance:none; width:100%; padding:14px 44px 14px 16px; font-family:inherit; font-size:15px; color:#1a1a1a; background:#f6f5f5; border:1px solid #e4e1db; border-radius:12px; cursor:pointer;">
             <option value="compra_e_venda">Compra e venda</option>
             <option value="doacao">Doação</option>
             <option value="sem_valor">Escritura sem valor declarado</option>
@@ -77,6 +89,8 @@
       }
     </section>
 
+
+
     <!-- SEÇÃO 2: ESTIMATIVA LOCAL (VALORES DO ATO) -->
     @if (mostraValores()) {
       <section>
@@ -89,7 +103,7 @@
           </button>
         </div>
 
-        <div style="border:1px solid #e8e5df; border-radius:16px; background:#fff; overflow-x:auto;">
+        <div style="border:1px solid #e8e5df; border-radius:16px; background:#f6f5f5; overflow-x:auto;">
           <table style="width:100%; border-collapse:collapse; font-size:14px; min-width:900px;">
             <thead>
               <tr style="border-bottom:1px solid #ecece8;">
@@ -156,7 +170,7 @@
     <!-- ACIONADOR DE CALCULO E MENSAGEM DE ERRO -->
     <div style="margin-top: 24px;">
       @if (!carregando()) {
-        <button (click)="calcular()" class="cc-btn cc-solid" style="display:inline-flex; align-items:center; gap:8px; padding:11px 18px; font-family:inherit; font-size:14px; font-weight:600; color:#fff; background:#1a1a1a; border:none; border-radius:11px; cursor:pointer;">
+        <button (click)="calcular()" class="cc-btn cc-solid" style="display:inline-flex; align-items:center; gap:8px; padding:11px 18px; font-family:inherit; font-size:14px; font-weight:600; color:#f8f5f5; background:#1a1a1a; border:none; border-radius:11px; cursor:pointer;">
           {{ resultado() ? 'Recalcular Emolumentos' : 'Processar Cálculo' }}
         </button>
       } @else {
@@ -176,11 +190,11 @@
     <section style="margin-top:40px;">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;">
         <span style="font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:#8a8478;">Total geral</span>
-        <span title="Fonte dos valores" style="display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:500; color:{{ getStatusColor().text }};">
-          <span style="width:7px; height:7px; border-radius:50%; background:{{ getStatusColor().dot }};"></span>{{ getStatusLabel() }}
+        <span title="Fonte dos valores" [style.color]="getStatusColor().text" style="display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:500;">
+          <span [style.background]="getStatusColor().dot" style="width:7px; height:7px; border-radius:50%;"></span>{{ getStatusLabel() }}
         </span>
       </div>
-      <div style="border:1px solid #e8e5df; border-radius:16px; overflow:hidden; background:#fff; overflow-x:auto;">
+      <div style="border:1px solid #e8e5df; border-radius:16px; overflow:hidden; background:#f8f5f5; overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse; font-size:14px; min-width:820px;">
           <thead>
             <tr style="background:#f6f4f1;">
@@ -193,7 +207,7 @@
               <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">FUNDEP</th>
               <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">ISSQN</th>
               <th style="padding:14px 16px; text-align:right; font-weight:500; font-size:12.5px; color:#8a8478;">VRC</th>
-              <th style="padding:14px 16px; text-align:right; font-weight:600; font-size:12.5px; color:#1a1a1a; background:#dad7d2;">Total</th>
+              <th style="padding:14px 16px; text-align:right; font-weight:600; font-size:12.5px; color:#1a1a1a; background:#e2ded7;">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -207,7 +221,7 @@
               <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('FUNDEP') }}</td>
               <td style="padding:18px 16px; text-align:right; color:#4a453d;">{{ getValorApi('ISSQN') }}</td>
               <td style="padding:18px 16px; text-align:right; color:#a49e92;">{{ getValorApi('VRC') }}</td>
-              <td style="padding:18px 16px; text-align:right; font-weight:700; font-size:16px; color:#1a1a1a; background:#dad7d2; white-space:nowrap;">
+              <td style="padding:18px 16px; text-align:right; font-weight:700; font-size:16px; color:#1a1a1a; background:#e2ded7; white-space:nowrap;">
                 {{ getTotalFinal() }}
               </td>
             </tr>
@@ -232,11 +246,12 @@
   </main>
 
   <!-- RODAPÉ -->
-  <footer data-noprint style="border-top:1px solid #ecece8; margin-top:20px;">
-    <div style="max-width:1120px; margin:0 auto; padding:22px 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:13px; color:#8a8478;">
-      <span>Desenvolvido por <strong style="color:#4a453d; font-weight:600;">Jeferson Braine Leal</strong> — Substituto Legal no Paraná</span>
-      <span style="display:inline-flex; gap:18px;"><a href="https://github.com/jefersonbraine/emolumentos-pr" target="_blank" rel="noopener noreferrer">emolumentos-pr</a><a href="https://github.com/jefersonbraine/emolumentos-api" target="_blank" rel="noopener noreferrer">emolumentos-api</a></span>
-    </div>
-  </footer>
+  <footer data-noprint style="position:relative; border-top:1px;  margin-top:20px;">
+
+  <div style="max-width:1120px; margin:0 auto; padding:16px 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:13px; color:#8a8478;">
+    <span>Desenvolvido por <strong style="color:#4a453d; font-weight:600;">Jeferson Braine Leal</strong> — Substituto Legal no Paraná</span>
+    <span style="display:inline-flex; gap:18px;"><a href="https://github.com/jefersonbraine/emolumentos-pr" target="_blank" rel="noopener noreferrer">emolumentos-pr</a><a href="https://github.com/jefersonbraine/emolumentos-api" target="_blank" rel="noopener noreferrer">emolumentos-api</a></span>
+  </div>
+</footer>
 
 </div>
