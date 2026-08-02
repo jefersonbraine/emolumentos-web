@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EmolumentosService } from '../emolumentos.service';
-import { CalculoRequest, CalculoResponse, TipoAto } from '../../emolumentos/emolumentos.models';
+import { CalculoRequest, CalculoResponse, TipoAto, ValorMonetario } from '../../emolumentos/emolumentos.models';
 
 export interface CalculoItemUI {
   id: string;
@@ -143,6 +143,10 @@ export class Calculadora {
     const chave = mapaChaves[nomeColuna];
     const totais = res.total_geral as any;
 
+    if (nomeColuna === 'VRC') {
+      return totais.vrc?.fmt ?? '0,000';
+    }
+
     if (chave && totais[chave]?.brl) {
       return totais[chave].brl.replace('R$ ', '').trim();
     }
@@ -153,64 +157,37 @@ export class Calculadora {
     return this.resultado()?.total_geral?.total?.brl || 'R$ 0,00';
   }
 
-  // Aproveita a array 'itens' da API para preencher a linha decomposta de cada imóvel
   estimativaLocal(item: CalculoItemUI) {
-    // Extrai o valor numérico digitado pelo usuário
-    const baseNum = parseFloat(item.baseStr.replace(/\./g, '').replace(',', '.')) || 0;
-    const active = baseNum > 0;
-
-    // Verifica se o item atual é o primeiro da lista de imóveis
-    const isPrimeiro = this.itens().length > 0 && this.itens()[0].id === item.id;
-
-    // Taxas fixas: aplicadas apenas se houver valor E for o primeiro imóvel
-    const selo = active && isPrimeiro ? 8.0 : 0;
-    const distrib = active && isPrimeiro ? 12.45 : 0;
-    const folha = active ? 0.0 : 0;
-
-    const formata = (n: number) =>
-      n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
+    const limpa = (v?: ValorMonetario) => (v?.brl ? v.brl.replace('R$ ', '').trim() : '0,00');
     const res = this.resultado();
+    const apiItem = res?.itens?.find((i) => i.descricao === item.desc);
 
-    if (res && res.itens) {
-      // Cruza o item da UI com a resposta da API através da Descrição
-      const apiItem = res.itens.find((i) => i.descricao === item.desc);
-
-      if (apiItem) {
-        const limpa = (v: any) => (v?.brl ? v.brl.replace('R$ ', '').trim() : '0,00');
-
-        // Somamos o total retornado pela API com as nossas taxas locais para fechar a conta da linha
-        const apiTotalNum = parseFloat(apiItem.total?.raw || '0');
-        const totalRow = apiTotalNum + selo + distrib + folha;
-
-        return {
-          emol: limpa(apiItem.emolumentos),
-          funrejus: limpa(apiItem.funrejus),
-          selo: formata(selo),
-          distrib: formata(distrib),
-          folha: formata(folha),
-          fundep: limpa(apiItem.fundep),
-          issqn: limpa(apiItem.issqn),
-          vrc: '0,000',
-          total: formata(totalRow),
-        };
-      }
+    if (!apiItem) {
+      return {
+        emol: '0,00',
+        funrejus: '0,00',
+        selo: '0,00',
+        distrib: '0,00',
+        folha: '0,00',
+        fundep: '0,00',
+        issqn: '0,00',
+        vrc: '0,000',
+        total: '0,00',
+      };
     }
 
-    // Fallback: Retorna as taxas fixas locais mesmo antes do cálculo oficial da API
     return {
-      emol: '0,00',
-      funrejus: '0,00',
-      selo: formata(selo),
-      distrib: formata(distrib),
-      folha: formata(folha),
-      fundep: '0,00',
-      issqn: '0,00',
-      vrc: '0,000',
-      total: formata(selo + distrib + folha),
+      emol: limpa(apiItem.emolumentos),
+      funrejus: limpa(apiItem.funrejus),
+      selo: limpa(apiItem.selo),
+      distrib: limpa(apiItem.distribuidor),
+      folha: limpa(apiItem.folha),
+      fundep: limpa(apiItem.fundep),
+      issqn: limpa(apiItem.issqn),
+      vrc: apiItem.vrc?.fmt ?? '0,000',
+      total: limpa(apiItem.total),
     };
   }
-
   getStatusLabel(): string {
     if (this.carregando()) return 'Calculando...';
     if (this.erro()) return 'API Indisponível';
