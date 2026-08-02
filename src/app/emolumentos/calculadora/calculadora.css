@@ -9,7 +9,7 @@
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border-light);
-  background: radial-gradient(720px 340px at 78% -30%, rgba(26,26,26,.05), transparent 60%);
+  background: radial-gradient(720px 340px at 78% -30%, rgba(26, 26, 26, 0.05), transparent 60%);
 }
 
 .calc-header-content {
@@ -42,6 +42,7 @@
   border-radius: 16px;
   background: var(--bg-surface);
   overflow-x: auto;
+  overflow-y: visible;
 }
 
 .emol-table {
@@ -98,7 +99,7 @@
 
 .pr-map-inner {
   position: relative;
-  width: 420px;      /* aumenta à vontade */
+  width: 420px; /* aumenta à vontade */
   max-width: 60%;
   margin-right: 20px;
 }
@@ -151,9 +152,15 @@
 }
 
 @keyframes pr-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(26,26,26,.35); }
-  70%  { box-shadow: 0 0 0 12px rgba(26,26,26,0); }
-  100% { box-shadow: 0 0 0 0 rgba(26,26,26,0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(26, 26, 26, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(26, 26, 26, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(26, 26, 26, 0);
+  }
 }
 
 .pr-star__tip {
@@ -185,7 +192,7 @@
   width: 700px;
   height: 500px;
   pointer-events: none;
-  z-index: -1;   /* era 1 — agora fica ATRÁS de tudo, não na frente */
+  z-index: -1; /* era 1 — agora fica ATRÁS de tudo, não na frente */
 
   background-color: rgba(26, 26, 26, 0.13);
 
@@ -206,6 +213,63 @@
 
 .calc-bg-texture {
   background-color: #dad3cc;
-  background-image: radial-gradient(ellipse 1400px 900px at 20% 0%, #f3f0eb 0%, #f1eae1 55%, #e6dace 100%);
+  background-image: radial-gradient(
+    ellipse 1400px 900px at 20% 0%,
+    #f3f0eb 0%,
+    #f1eae1 55%,
+    #e6dace 100%
+  );
   background-attachment: fixed;
+}
+
+.th-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+  border-radius: 50%;
+  border: 1px solid #b8b2a8;
+  background: none;
+  color: #8a8478;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.th-info-btn:hover {
+  border-color: #1a1a1a;
+  color: #1a1a1a;
+}
+
+.th-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  margin-top: 6px;
+  width: 220px;
+  background: #1a1a1a;
+  color: #faf9f7;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-transform: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  white-space: normal;
+}
+
+.explicacao-coluna {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #efeae9;
+  border: 1px solid #c4bfafea;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #2a2620
 }
