@@ -20,8 +20,12 @@ export interface ItemCalculado {
   valor_base?: ValorMonetario;
   emolumentos?: ValorMonetario;
   funrejus?: ValorMonetario;
+  selo?: ValorMonetario;
+  distribuidor?: ValorMonetario;
+  folha?: ValorMonetario;
   fundep?: ValorMonetario;
   issqn?: ValorMonetario;
+  vrc?: ValorNumerico;
   total?: ValorMonetario;
 }
 
@@ -43,4 +47,9 @@ export interface CalculoResponse {
   tipo: string;
   itens: ItemCalculado[];
   total_geral: TotalGeral;
+}
+
+export interface ValorNumerico {
+  raw: string;
+  fmt: string;
 }
