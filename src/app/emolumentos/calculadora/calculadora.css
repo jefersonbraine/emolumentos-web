@@ -387,7 +387,6 @@
   font-size: 13.5px;
   font-weight: 600;
   color: #1a1a1a;
-  text-transform: capitalize;
 }
 
 .historico-total {
@@ -435,4 +434,85 @@
 .btn-limpar-tudo:hover {
   border-color: #9a5a1f;
   background: #faf0ee;
+}
+
+/* Responsividade Mobile */
+
+@media (max-width: 768px) {
+  /* Título e textos do header — menores em telas pequenas */
+  h1 {
+    font-size: 32px !important;
+    line-height: 1.1 !important;
+  }
+
+  header p {
+    font-size: 15px !important;
+  }
+
+  header > div {
+    padding: 24px 20px 32px !important;
+  }
+
+  /* Mapa decorativo — encolhe bastante, some em telas muito estreitas */
+  .pr-map-inner {
+    width: 180px !important;
+    max-width: 45% !important;
+  }
+
+  /* Araucárias — reduz de 700x500 pra algo que não domine a tela */
+  .footer-araucarias {
+    width: 260px !important;
+    height: 180px !important;
+  }
+
+  /* Container principal — reduz o padding lateral de 40px pra algo mais justo */
+  main, .calc-header-content {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  /* Seção Natureza do ato / Usufruto / Partes — empilha em vez de lado a lado */
+  section > div[style*="flex-wrap: wrap"] {
+    gap: 14px !important;
+  }
+
+  /* Botões de ação — ocupam a largura toda, um embaixo do outro fica mais tocável */
+  div[style*="flex-wrap: wrap"][style*="margin-top: 20px"] button {
+    flex: 1 1 100% !important;
+  }
+
+  /* Modal do histórico — encaixa na tela pequena */
+  .historico-modal {
+    max-width: 100% !important;
+    padding: 18px !important;
+  }
+
+  .historico-overlay {
+    padding: 12px !important;
+  }
+
+  /* Tooltip de coluna — evita estourar a largura da tela */
+  .th-tooltip,
+  .explicacao-coluna {
+    width: auto !important;
+    max-width: calc(100vw - 40px) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 26px !important;
+  }
+
+  /* Araucárias — reduzidas, mas ainda visíveis no canto */
+  .footer-araucarias {
+    width: 380px !important;
+    height: 230px !important;
+    opacity: 0.7;
+  }
+
+  /* Mapa do header — esse sim some, porque compete direto com o título */
+  .pr-map-wrap {
+    display: none !important;
+  }
 }
