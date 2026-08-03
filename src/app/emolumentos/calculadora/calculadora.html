@@ -899,6 +899,7 @@
           Ver histórico
         </button>
         <button
+          (click)="copiarResultado()"
           class="cc-btn cc-ghost"
           style="
             display: inline-flex;
@@ -915,7 +916,7 @@
             cursor: pointer;
           "
         >
-          Copiar resultado
+          {{ copiadoFeedback() ? '✓ Copiado!' : 'Copiar resultado' }}
         </button>
         <button
           class="cc-btn cc-ghost"

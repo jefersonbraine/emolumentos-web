@@ -407,4 +407,58 @@ export class Calculadora {
     const agora = new Date();
     return `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
   }
+
+  // --- COPIAR RESULTADO ---
+
+  copiadoFeedback = signal(false);
+
+  copiarResultado() {
+    const res = this.resultado();
+    if (!res) {
+      this.erro.set('Calcule o valor antes de copiar o resultado.');
+      return;
+    }
+
+    const linhas: string[] = [];
+
+    linhas.push(`Escritura de ${this.rotuloAto(this.tipo())}:`);
+
+    if (res.itens.length > 0) {
+      linhas.push('Valor declarado:');
+      linhas.push('');
+
+      const itensUi = this.itens();
+      res.itens.forEach((item, i) => {
+        const desc = itensUi[i]?.desc ?? item.descricao.replace(' (maior valor)', '');
+        linhas.push(`* ${desc}: ${item.valor_base?.brl ?? 'R$ 0,00'}`);
+      });
+
+      linhas.push('');
+      if (res.total_geral.valor_base?.brl) {
+        linhas.push(`Valor total dos bens: ${res.total_geral.valor_base.brl}`);
+      }
+      linhas.push('');
+    }
+
+    linhas.push(`*Valor total da escritura:* ${res.total_geral.total?.brl ?? '—'}`);
+    linhas.push('');
+
+    const agora = new Date();
+    linhas.push(
+      `Simulação gerada em ${agora.toLocaleDateString('pt-BR')} às ` +
+        `${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`,
+    );
+
+    const texto = linhas.join('\n');
+
+    navigator.clipboard.writeText(texto).then(
+      () => {
+        this.copiadoFeedback.set(true);
+        setTimeout(() => this.copiadoFeedback.set(false), 2200);
+      },
+      () => {
+        this.erro.set('Não foi possível copiar automaticamente. Tente novamente.');
+      },
+    );
+  }
 }
