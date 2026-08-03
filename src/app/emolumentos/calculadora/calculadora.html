@@ -859,6 +859,7 @@
       <!-- BOTÕES DE AÇÃO -->
       <div data-noprint style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px">
         <button
+        (click)="salvarNoHistorico()"
           class="cc-btn cc-solid"
           style="
             display: inline-flex;
@@ -876,6 +877,26 @@
           "
         >
           Salvar cálculo
+        </button>
+        <button
+          (click)="toggleHistorico()"
+          class="cc-btn cc-solid"
+          style="
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 18px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: #1a1a1a;
+            border: none;
+            border-radius: 11px;
+            cursor: pointer;
+          "
+        >
+          Ver histórico
         </button>
         <button
           class="cc-btn cc-ghost"
@@ -919,6 +940,37 @@
       </div>
     </section>
   </main>
+
+ @if (mostrarHistorico()) {
+  <div class="historico-overlay" (click)="toggleHistorico()">
+    <div class="historico-modal" (click)="$event.stopPropagation()">
+      <div class="historico-cabecalho">
+        <h3>Histórico de cálculos</h3>
+        <button (click)="toggleHistorico()" class="historico-fechar" aria-label="Fechar">×</button>
+      </div>
+
+      @if (historico().length === 0) {
+        <p class="historico-vazio">Nenhum cálculo salvo ainda.</p>
+      } @else {
+        <ul class="historico-lista">
+          @for (h of historico(); track h.id) {
+            <li class="historico-item">
+              <button (click)="carregarDoHistorico(h); toggleHistorico()" class="historico-item-btn">
+                <div class="historico-item-topo">
+                  <span class="historico-tipo">{{ rotuloAto(h.tipo) }}</span>
+                  <span class="historico-total">{{ h.totalBrl }}</span>
+                </div>
+                <span class="historico-data">{{ h.data | date:'dd/MM/yy · HH:mm' }}</span>
+              </button>
+              <button (click)="removerDoHistorico(h.id); $event.stopPropagation()" class="historico-remover" aria-label="Remover">×</button>
+            </li>
+          }
+        </ul>
+        <button (click)="limparHistorico()" class="btn-limpar-tudo">Limpar histórico</button>
+      }
+    </div>
+  </div>
+}
 
   <!-- RODAPÉ -->
   <footer data-noprint style="position: relative; border-top: 1px; margin-top: 20px">
