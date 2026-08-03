@@ -337,4 +337,8 @@ export class Calculadora {
   rotuloAto(tipo: string): string {
     return this.rotulosAtos[tipo] ?? tipo;
   }
+  dataAtualFormatada(): string {
+    const agora = new Date();
+    return `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+  }
 }

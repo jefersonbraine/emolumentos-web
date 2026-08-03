@@ -941,6 +941,66 @@
     </section>
   </main>
 
+  <!-- BLOCO EXCLUSIVO PARA IMPRESSÃO -->
+<div class="print-relatorio">
+  <h2>Natureza do ato</h2>
+  <p class="print-tipo-ato">{{ rotuloAto(tipo()) }}</p>
+
+  @if (resultado(); as res) {
+    @if (res.itens.length > 0) {
+      <h2>Valores declarados</h2>
+      <table class="print-tabela-itens">
+        @for (item of itens(); track item.id; let i = $index) {
+          <tr>
+            <td>{{ item.desc }}</td>
+            <td class="print-valor">{{ res.itens[i]?.valor_base?.brl ?? item.baseStr }}</td>
+          </tr>
+        }
+      </table>
+    }
+
+    <h2>Total geral</h2>
+    <table class="print-tabela-total">
+      <tr>
+        <td>Valor base</td>
+        <td class="print-valor">{{ res.total_geral.valor_base?.brl ?? '—' }}</td>
+      </tr>
+      <tr>
+        <td>Emolumentos</td>
+        <td class="print-valor">{{ res.total_geral.emolumentos?.brl ?? '—' }}</td>
+      </tr>
+      <tr>
+        <td>Funrejus</td>
+        <td class="print-valor">{{ res.total_geral.funrejus?.brl ?? '—' }}</td>
+      </tr>
+      <tr>
+        <td>Selo</td>
+        <td class="print-valor">{{ res.total_geral.selo?.brl ?? '—' }}</td>
+      </tr>
+      <tr>
+        <td>Distribuidor</td>
+        <td class="print-valor">{{ res.total_geral.distribuidor?.brl ?? '—' }}</td>
+      </tr>
+      <tr>
+        <td>FUNDEP</td>
+        <td class="print-valor">{{ res.total_geral.fundep?.brl ?? '—' }}</td>
+      </tr>
+      <tr>
+        <td>ISSQN</td>
+        <td class="print-valor">{{ res.total_geral.issqn?.brl ?? '—' }}</td>
+      </tr>
+    </table>
+
+    <p class="print-total-final">Total: {{ res.total_geral.total?.brl ?? '—' }}</p>
+  } @else {
+    <p>Nenhum cálculo processado ainda.</p>
+  }
+
+  <p class="print-rodape">
+    Simulação gerada em {{ dataAtualFormatada() }} — Jeferson Braine Leal, Substituto Legal no Paraná.
+  </p>
+</div>
+
  @if (mostrarHistorico()) {
   <div class="historico-overlay" (click)="toggleHistorico()">
     <div class="historico-modal" (click)="$event.stopPropagation()">

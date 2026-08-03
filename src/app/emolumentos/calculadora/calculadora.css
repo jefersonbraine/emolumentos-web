@@ -516,3 +516,97 @@
     display: none !important;
   }
 }
+
+/* exportar pdf */
+/* Bloco de impressão — invisível na tela */
+.print-relatorio {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+
+  /* Esconde TUDO da tela normal na impressão */
+  header,
+  main,
+  footer,
+  .historico-overlay {
+    display: none !important;
+  }
+
+  .calc-bg-texture {
+    background: #fff !important;
+    background-image: none !important;
+    min-height: 0 !important;
+  }
+
+  /* E mostra só o relatório */
+  .print-relatorio {
+    display: block !important;
+    font-family: 'Instrument Sans', Arial, sans-serif;
+    color: #1a1a1a;
+  }
+
+  .print-relatorio h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4a453d;
+    margin: 20px 0 8px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+  }
+
+  .print-relatorio h2:first-child {
+    margin-top: 0;
+  }
+
+  .print-tipo-ato {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 12px;
+  }
+
+  .print-tabela-itens,
+  .print-tabela-total {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .print-tabela-itens td,
+  .print-tabela-total td {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .print-valor {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .print-total-final {
+    font-size: 18px;
+    font-weight: 700;
+    text-align: right;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 2px solid #1a1a1a;
+  }
+
+  .print-rodape {
+    margin-top: 40px;
+    font-size: 10px;
+    color: #8a8478;
+    text-align: center;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+}
