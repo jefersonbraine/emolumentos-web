@@ -285,7 +285,7 @@
                     font-size: 12.5px;
                     color: #8a8478;
                     text-align: right;
-                    white-space:nowrap;
+                    white-space: nowrap;
                   "
                 >
                   Emolumentos
@@ -305,7 +305,7 @@
                     font-size: 12.5px;
                     color: #8a8478;
                     text-align: right;
-                    white-space:nowrap;
+                    white-space: nowrap;
                   "
                 >
                   Funrejus
@@ -325,7 +325,7 @@
                     font-size: 12.5px;
                     color: #8a8478;
                     text-align: right;
-                    white-space:nowrap;
+                    white-space: nowrap;
                   "
                 >
                   Selo
@@ -345,7 +345,7 @@
                     font-size: 12.5px;
                     color: #8a8478;
                     text-align: right;
-                    white-space:nowrap;
+                    white-space: nowrap;
                   "
                 >
                   Distribuidor
@@ -365,7 +365,7 @@
                     font-size: 12.5px;
                     color: #8a8478;
                     text-align: right;
-                    white-space:nowrap;
+                    white-space: nowrap;
                   "
                 >
                   Folha
@@ -385,7 +385,7 @@
                     font-size: 12.5px;
                     color: #8a8478;
                     text-align: right;
-                    white-space:nowrap;
+                    white-space: nowrap;
                   "
                 >
                   FUNDEP
@@ -405,7 +405,7 @@
                     font-size: 12.5px;
                     color: #8a8478;
                     text-align: right;
-                    white-space:nowrap;
+                    white-space: nowrap;
                   "
                 >
                   ISSQN
@@ -425,7 +425,7 @@
                     font-size: 12.5px;
                     color: #8a8478;
                     text-align: right;
-                    white-space:nowrap;
+                    white-space: nowrap;
                   "
                 >
                   VRC
@@ -859,7 +859,7 @@
       <!-- BOTÕES DE AÇÃO -->
       <div data-noprint style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px">
         <button
-        (click)="salvarNoHistorico()"
+          (click)="salvarNoHistorico()"
           class="cc-btn cc-solid"
           style="
             display: inline-flex;
@@ -937,100 +937,132 @@
         >
           Exportar PDF
         </button>
+        <button
+          (click)="copiarLink()"
+          class="cc-btn cc-ghost"
+          style="
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 18px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+            background: #fff;
+            border: 1px solid #e4e1db;
+            border-radius: 11px;
+            cursor: pointer;
+          "
+        >
+          {{ linkCopiadoFeedback() ? '✓ Link copiado!' : 'Copiar link' }}
+        </button>
       </div>
     </section>
   </main>
 
   <!-- BLOCO EXCLUSIVO PARA IMPRESSÃO -->
-<div class="print-relatorio">
-  <h2>Natureza do ato</h2>
-  <p class="print-tipo-ato">{{ rotuloAto(tipo()) }}</p>
+  <div class="print-relatorio">
+    <h2>Natureza do ato</h2>
+    <p class="print-tipo-ato">{{ rotuloAto(tipo()) }}</p>
 
-  @if (resultado(); as res) {
-    @if (res.itens.length > 0) {
-      <h2>Valores declarados</h2>
-      <table class="print-tabela-itens">
-        @for (item of itens(); track item.id; let i = $index) {
-          <tr>
-            <td>{{ item.desc }}</td>
-            <td class="print-valor">{{ res.itens[i]?.valor_base?.brl ?? item.baseStr }}</td>
-          </tr>
-        }
+    @if (resultado(); as res) {
+      @if (res.itens.length > 0) {
+        <h2>Valores declarados</h2>
+        <table class="print-tabela-itens">
+          @for (item of itens(); track item.id; let i = $index) {
+            <tr>
+              <td>{{ item.desc }}</td>
+              <td class="print-valor">{{ res.itens[i]?.valor_base?.brl ?? item.baseStr }}</td>
+            </tr>
+          }
+        </table>
+      }
+
+      <h2>Total geral</h2>
+      <table class="print-tabela-total">
+        <tr>
+          <td>Valor base</td>
+          <td class="print-valor">{{ res.total_geral.valor_base?.brl ?? '—' }}</td>
+        </tr>
+        <tr>
+          <td>Emolumentos</td>
+          <td class="print-valor">{{ res.total_geral.emolumentos?.brl ?? '—' }}</td>
+        </tr>
+        <tr>
+          <td>Funrejus</td>
+          <td class="print-valor">{{ res.total_geral.funrejus?.brl ?? '—' }}</td>
+        </tr>
+        <tr>
+          <td>Selo</td>
+          <td class="print-valor">{{ res.total_geral.selo?.brl ?? '—' }}</td>
+        </tr>
+        <tr>
+          <td>Distribuidor</td>
+          <td class="print-valor">{{ res.total_geral.distribuidor?.brl ?? '—' }}</td>
+        </tr>
+        <tr>
+          <td>FUNDEP</td>
+          <td class="print-valor">{{ res.total_geral.fundep?.brl ?? '—' }}</td>
+        </tr>
+        <tr>
+          <td>ISSQN</td>
+          <td class="print-valor">{{ res.total_geral.issqn?.brl ?? '—' }}</td>
+        </tr>
       </table>
+
+      <p class="print-total-final">Total: {{ res.total_geral.total?.brl ?? '—' }}</p>
+    } @else {
+      <p>Nenhum cálculo processado ainda.</p>
     }
 
-    <h2>Total geral</h2>
-    <table class="print-tabela-total">
-      <tr>
-        <td>Valor base</td>
-        <td class="print-valor">{{ res.total_geral.valor_base?.brl ?? '—' }}</td>
-      </tr>
-      <tr>
-        <td>Emolumentos</td>
-        <td class="print-valor">{{ res.total_geral.emolumentos?.brl ?? '—' }}</td>
-      </tr>
-      <tr>
-        <td>Funrejus</td>
-        <td class="print-valor">{{ res.total_geral.funrejus?.brl ?? '—' }}</td>
-      </tr>
-      <tr>
-        <td>Selo</td>
-        <td class="print-valor">{{ res.total_geral.selo?.brl ?? '—' }}</td>
-      </tr>
-      <tr>
-        <td>Distribuidor</td>
-        <td class="print-valor">{{ res.total_geral.distribuidor?.brl ?? '—' }}</td>
-      </tr>
-      <tr>
-        <td>FUNDEP</td>
-        <td class="print-valor">{{ res.total_geral.fundep?.brl ?? '—' }}</td>
-      </tr>
-      <tr>
-        <td>ISSQN</td>
-        <td class="print-valor">{{ res.total_geral.issqn?.brl ?? '—' }}</td>
-      </tr>
-    </table>
-
-    <p class="print-total-final">Total: {{ res.total_geral.total?.brl ?? '—' }}</p>
-  } @else {
-    <p>Nenhum cálculo processado ainda.</p>
-  }
-
-  <p class="print-rodape">
-    Simulação gerada em {{ dataAtualFormatada() }} — Jeferson Braine Leal, Substituto Legal no Paraná.
-  </p>
-</div>
-
- @if (mostrarHistorico()) {
-  <div class="historico-overlay" (click)="toggleHistorico()">
-    <div class="historico-modal" (click)="$event.stopPropagation()">
-      <div class="historico-cabecalho">
-        <h3>Histórico de cálculos</h3>
-        <button (click)="toggleHistorico()" class="historico-fechar" aria-label="Fechar">×</button>
-      </div>
-
-      @if (historico().length === 0) {
-        <p class="historico-vazio">Nenhum cálculo salvo ainda.</p>
-      } @else {
-        <ul class="historico-lista">
-          @for (h of historico(); track h.id) {
-            <li class="historico-item">
-              <button (click)="carregarDoHistorico(h); toggleHistorico()" class="historico-item-btn">
-                <div class="historico-item-topo">
-                  <span class="historico-tipo">{{ rotuloAto(h.tipo) }}</span>
-                  <span class="historico-total">{{ h.totalBrl }}</span>
-                </div>
-                <span class="historico-data">{{ h.data | date:'dd/MM/yy · HH:mm' }}</span>
-              </button>
-              <button (click)="removerDoHistorico(h.id); $event.stopPropagation()" class="historico-remover" aria-label="Remover">×</button>
-            </li>
-          }
-        </ul>
-        <button (click)="limparHistorico()" class="btn-limpar-tudo">Limpar histórico</button>
-      }
-    </div>
+    <p class="print-rodape">
+      Simulação gerada em {{ dataAtualFormatada() }} — Jeferson Braine Leal, Substituto Legal no
+      Paraná.
+    </p>
   </div>
-}
+
+  @if (mostrarHistorico()) {
+    <div class="historico-overlay" (click)="toggleHistorico()">
+      <div class="historico-modal" (click)="$event.stopPropagation()">
+        <div class="historico-cabecalho">
+          <h3>Histórico de cálculos</h3>
+          <button (click)="toggleHistorico()" class="historico-fechar" aria-label="Fechar">
+            ×
+          </button>
+        </div>
+
+        @if (historico().length === 0) {
+          <p class="historico-vazio">Nenhum cálculo salvo ainda.</p>
+        } @else {
+          <ul class="historico-lista">
+            @for (h of historico(); track h.id) {
+              <li class="historico-item">
+                <button
+                  (click)="carregarDoHistorico(h); toggleHistorico()"
+                  class="historico-item-btn"
+                >
+                  <div class="historico-item-topo">
+                    <span class="historico-tipo">{{ rotuloAto(h.tipo) }}</span>
+                    <span class="historico-total">{{ h.totalBrl }}</span>
+                  </div>
+                  <span class="historico-data">{{ h.data | date: 'dd/MM/yy · HH:mm' }}</span>
+                </button>
+                <button
+                  (click)="removerDoHistorico(h.id); $event.stopPropagation()"
+                  class="historico-remover"
+                  aria-label="Remover"
+                >
+                  ×
+                </button>
+              </li>
+            }
+          </ul>
+          <button (click)="limparHistorico()" class="btn-limpar-tudo">Limpar histórico</button>
+        }
+      </div>
+    </div>
+  }
 
   <!-- RODAPÉ -->
   <footer data-noprint style="position: relative; border-top: 1px; margin-top: 20px">
