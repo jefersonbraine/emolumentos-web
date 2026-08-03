@@ -7,6 +7,7 @@ import {
   TipoAto,
   ValorMonetario,
 } from '../../emolumentos/emolumentos.models';
+import { DatePipe } from '@angular/common';
 
 export interface CalculoItemUI {
   id: string;
@@ -14,15 +15,81 @@ export interface CalculoItemUI {
   baseStr: string;
 }
 
+export interface CalculoHistorico {
+  id: string;
+  data: string,
+  tipo: TipoAto | 'partilha' | 'cessao_direitos' | 'compra_e_venda' | 'doacao' | 'sem_valor' | 'procuracao';
+  itens: { desc: string, valor: string }[];
+  totalBrl: string;
+}
+
 @Component({
   selector: 'app-calculadora',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './calculadora.html',
   styleUrl: './calculadora.css',
 })
 export class Calculadora {
   private service = inject(EmolumentosService);
+  private readonly HISTORICO_KEY = 'emolumentos_historico';
+  private readonly HISTORICO_MAX = 15;
+
+  historico = signal<CalculoHistorico[]>(this.carregarHistorico());
+
+  // --- HISTÓRICO LOCAL ---
+  private carregarHistorico(): CalculoHistorico[] {
+    try {
+      const bruto = localStorage.getItem(this.HISTORICO_KEY);
+      return bruto ? JSON.parse(bruto) : [];
+    } catch {
+      return []; // localStorage corrompido/indisponível: começa vazio, sem quebrar a tela
+    }
+  }
+
+  private salvarHistorico() {
+    try {
+      localStorage.setItem(this.HISTORICO_KEY, JSON.stringify(this.historico()));
+    } catch {
+      // Se o navegador bloquear localStorage (modo privado, cota cheia),
+      // a calculadora continua funcionando — só o histórico não persiste.
+    }
+  }
+
+  salvarNoHistorico() {
+    const res = this.resultado();
+    if (!res) return;
+
+    const entrada: CalculoHistorico = {
+      id: this.generateId(),
+      data: new Date().toISOString(),
+      tipo: this.tipo(),
+      itens: this.itens().map((i) => ({ desc: i.desc, valor: i.baseStr })),
+      totalBrl: res.total_geral?.total?.brl ?? 'R$ 0,00',
+    };
+
+    this.historico.update((atual) => [entrada, ...atual].slice(0, this.HISTORICO_MAX));
+    this.salvarHistorico();
+  }
+
+  carregarDoHistorico(entrada: CalculoHistorico) {
+    this.tipo.set(entrada.tipo as TipoAto);
+    this.itens.set(
+      entrada.itens.map((i) => ({ id: this.generateId(), desc: i.desc, baseStr: i.valor })),
+    );
+    this.resultado.set(null); // limpa o resultado antigo — obriga recalcular
+    this.erro.set(null);
+  }
+
+  removerDoHistorico(id: string) {
+    this.historico.update((atual) => atual.filter((h) => h.id !== id));
+    this.salvarHistorico();
+  }
+
+  limparHistorico() {
+    this.historico.set([]);
+    this.salvarHistorico();
+  }
 
   // --- SINAIS DE ENTRADA ---
   tipo = signal<TipoAto>('compra_e_venda');
@@ -57,12 +124,12 @@ export class Calculadora {
     );
   }
 
-  // NOVO: Intercepta a digitação e aplica a máscara em tempo real
+  // Intercepta a digitação e aplica a máscara em tempo real
   onValorChange(item: CalculoItemUI, novoValor: string) {
     item.baseStr = this.mascaraMoeda(novoValor);
   }
 
-  // NOVO: Lógica de pontuação automática
+  // Lógica de pontuação automática
   private mascaraMoeda(valor: string): string {
     if (!valor) return '';
     // Remove tudo que não for dígito
@@ -249,5 +316,25 @@ export class Calculadora {
 
   fecharTooltip() {
     this.tooltipAberto.set(null);
+  }
+
+  mostrarHistorico = signal(false);
+
+  toggleHistorico() {
+    this.mostrarHistorico.update((v) => !v);
+  }
+
+  private rotulosAtos: Record<string, string> = {
+    compra_e_venda: 'Compra e venda',
+    doacao: 'Doação',
+    sem_valor: 'Escritura sem valor',
+    procuracao: 'Procuração',
+    partilha: 'Inventário/Divórcio',
+    cessao_direitos: 'Cessão de direitos',
+    declaracao: 'Declaração',
+  };
+
+  rotuloAto(tipo: string): string {
+    return this.rotulosAtos[tipo] ?? tipo;
   }
 }
