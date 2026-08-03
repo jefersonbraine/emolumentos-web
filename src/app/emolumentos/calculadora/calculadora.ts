@@ -8,6 +8,7 @@ import {
   ValorMonetario,
 } from '../../emolumentos/emolumentos.models';
 import { DatePipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 
 export interface CalculoItemUI {
   id: string;
@@ -31,11 +32,76 @@ export interface CalculoHistorico {
   styleUrl: './calculadora.css',
 })
 export class Calculadora {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   private service = inject(EmolumentosService);
   private readonly HISTORICO_KEY = 'emolumentos_historico';
   private readonly HISTORICO_MAX = 15;
 
   historico = signal<CalculoHistorico[]>(this.carregarHistorico());
+
+  linkCopiadoFeedback = signal(false);
+
+  // --- Link compartilhado ---
+
+  constructor() {
+    this.route.queryParams.subscribe((params) => {
+      if (params['tipo']) {
+        this.tipo.set(params['tipo'] as TipoAto);
+      }
+      if (params['valores']) {
+        const valoresBrutos: string[] = params['valores'].split(',');
+        this.itens.set(
+          valoresBrutos.map((v, i) => ({
+            id: this.generateId(),
+            desc: `Item ${i + 1}`,
+            baseStr: this.mascaraMoeda(v),
+          })),
+        );
+      }
+      if (params['usufruto'] === '1') {
+        this.usufruto.set(true);
+      }
+      if (params['partes']) {
+        this.partesAdicionais.set(Number(params['partes']) || 0);
+      }
+    });
+  }
+
+  copiarLink() {
+    const params = new URLSearchParams();
+    params.set('tipo', this.tipo());
+
+    if (this.mostraValores()) {
+      const valores = this.itens()
+        .map((i) => i.baseStr.replace(/\./g, '').replace(',', '.'))
+        .filter((v) => v !== '' && Number(v) > 0);
+      if (valores.length > 0) {
+        params.set('valores', valores.join(','));
+      }
+    }
+
+    if (this.mostraUsufruto() && this.usufruto()) {
+      params.set('usufruto', '1');
+    }
+
+    if (this.mostraPartes() && this.partesAdicionais() > 0) {
+      params.set('partes', String(this.partesAdicionais()));
+    }
+
+    const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+
+    navigator.clipboard.writeText(url).then(
+      () => {
+        this.linkCopiadoFeedback.set(true);
+        setTimeout(() => this.linkCopiadoFeedback.set(false), 2200);
+      },
+      () => {
+        this.erro.set('Não foi possível copiar o link automaticamente.');
+      },
+    );
+  }
 
   // --- HISTÓRICO LOCAL ---
   private carregarHistorico(): CalculoHistorico[] {
