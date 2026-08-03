@@ -10,5 +10,8 @@ const conteudo = `export const environment = {
 };
 `;
 
+
+fs.writeFileSync('src/environments/environment.ts', conteudo);
 fs.writeFileSync('src/environments/environment.prod.ts', conteudo);
-console.log('environment.prod.ts gerado com sucesso.');
+
+console.log('environment.ts e environment.prod.ts gerados com sucesso.');
