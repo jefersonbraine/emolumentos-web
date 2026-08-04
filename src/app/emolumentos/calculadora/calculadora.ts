@@ -45,7 +45,7 @@ export class Calculadora {
 
   private service = inject(EmolumentosService);
   private readonly HISTORICO_KEY = 'emolumentos_historico';
-  private readonly HISTORICO_MAX = 15;
+  private readonly HISTORICO_MAX = 50;
 
   historico = signal<CalculoHistorico[]>(this.carregarHistorico());
 
