@@ -18,9 +18,17 @@ export interface CalculoItemUI {
 
 export interface CalculoHistorico {
   id: string;
-  data: string,
-  tipo: TipoAto | 'partilha' | 'cessao_direitos' | 'compra_e_venda' | 'doacao' | 'sem_valor' | 'procuracao';
-  itens: { desc: string, valor: string }[];
+  data: string;
+  tipo:
+    | TipoAto
+    | 'partilha'
+    | 'cessao_direitos'
+    | 'compra_e_venda'
+    | 'doacao'
+    | 'sem_valor'
+    | 'procuracao';
+  cliente: string | null;
+  itens: { desc: string; valor: string }[];
   totalBrl: string;
 }
 
@@ -126,10 +134,14 @@ export class Calculadora {
     const res = this.resultado();
     if (!res) return;
 
+    const nome = this.nomeCliente().trim();
+    const rotulo = nome ? nome : this.rotuloAto(this.tipo());
+
     const entrada: CalculoHistorico = {
       id: this.generateId(),
       data: new Date().toISOString(),
       tipo: this.tipo(),
+      cliente: nome || null,
       itens: this.itens().map((i) => ({ desc: i.desc, valor: i.baseStr })),
       totalBrl: res.total_geral?.total?.brl ?? 'R$ 0,00',
     };
@@ -461,4 +473,6 @@ export class Calculadora {
       },
     );
   }
+
+  nomeCliente = signal('');
 }

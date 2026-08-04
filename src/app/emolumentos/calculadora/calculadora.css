@@ -271,7 +271,7 @@
   border-radius: 6px;
   font-size: 13px;
   line-height: 1.5;
-  color: #2a2620
+  color: #2a2620;
 }
 
 /* Histórico de valores */
@@ -466,18 +466,19 @@
   }
 
   /* Container principal — reduz o padding lateral de 40px pra algo mais justo */
-  main, .calc-header-content {
+  main,
+  .calc-header-content {
     padding-left: 20px !important;
     padding-right: 20px !important;
   }
 
   /* Seção Natureza do ato / Usufruto / Partes — empilha em vez de lado a lado */
-  section > div[style*="flex-wrap: wrap"] {
+  section > div[style*='flex-wrap: wrap'] {
     gap: 14px !important;
   }
 
   /* Botões de ação — ocupam a largura toda, um embaixo do outro fica mais tocável */
-  div[style*="flex-wrap: wrap"][style*="margin-top: 20px"] button {
+  div[style*='flex-wrap: wrap'][style*='margin-top: 20px'] button {
     flex: 1 1 100% !important;
   }
 
@@ -609,4 +610,22 @@
   tr {
     break-inside: avoid;
   }
+
+  .print-cliente {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #1a1a1a;
+  }
+  
+  .print-cliente-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8a8478;
+  margin: 0 0 2px;
+}
 }
