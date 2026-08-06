@@ -30,9 +30,7 @@ advocacia no Paraná, com cálculo oficial baseado na Tabela XI do TJPR.
 - **Breakdown completo** por bem e no total geral: Emolumentos, Funrejus, Selo,
   Distribuidor, FUNDEP, ISSQN e VRC — com tooltips explicando cada um.
 - **Histórico local**, salvo no navegador, sem backend adicional.
-- **Exportação em PDF** formatada para A4, com cabeçalho e marca d'água
-  personalizáveis (white-label) para quem quiser entregar o orçamento com a
-  própria marca.
+- **Exportação em PDF** formatada para A4.
 - **Link compartilhável** — o tipo de ato e os valores viajam pela URL, prontos
   para recalcular do outro lado.
 - **Responsivo**, com identidade visual própria (o contorno do Paraná, araucárias,
