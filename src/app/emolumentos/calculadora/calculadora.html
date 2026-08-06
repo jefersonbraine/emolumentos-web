@@ -273,7 +273,7 @@
               cursor: pointer;
             "
           >
-            <span style="font-size: 15px; line-height: 1">+</span> Adicionar imóvel
+            <span style="font-size: 15px; line-height: 1">+</span> Adicionar bem
           </button>
         </div>
 
@@ -888,6 +888,30 @@
         </table>
       </div>
 
+      @if (itcmdEstimado(); as itcmd) {
+        <div class="itcmd-card">
+          <p class="itcmd-titulo">Estimativa de ITCMD (não incluído no total acima)</p>
+          <p class="itcmd-valor">
+            Alíquota de <strong>{{ itcmd.aliquotaPct }}</strong> sobre o valor declarado —
+            estimativa: <strong>{{ itcmd.valor }}</strong>
+          </p>
+          @if (itcmd.comUsufruto) {
+            <p class="itcmd-nota">
+              Refere-se apenas à parcela devida agora, sobre metade do valor do bem (base reduzida
+              por força do usufruto — art. 47 da Lei 18.573/2015). Na extinção do usufruto (óbito ou
+              renúncia), será devida nova apuração de 4% sobre a outra metade, pelo valor atualizado
+              à época.
+            </p>
+          }
+          <p class="itcmd-disclaimer">
+            Alíquota fixa vigente (art. 22 da Lei 18.573/2015), sem faixa por valor. Não considera
+            isenções do art. 11 (ex.: único imóvel residencial, imóvel rural para subsistência
+            familiar), que dependem de análise caso a caso. Se houver mais de um bem, o usufruto é
+            considerado igual para todos.
+          </p>
+        </div>
+      }
+
       <!-- BOTÕES DE AÇÃO -->
       <div data-noprint style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px">
         <button
@@ -996,7 +1020,6 @@
 
   <!-- BLOCO EXCLUSIVO PARA IMPRESSÃO -->
   <div class="print-relatorio">
-
     @if (nomeCliente().trim()) {
       <p class="print-cliente-label">Orçamento para</p>
       <p class="print-cliente">Cliente: {{ nomeCliente() }}</p>
@@ -1004,8 +1027,6 @@
 
     <h2>Natureza do ato</h2>
     <p class="print-tipo-ato">{{ rotuloAto(tipo()) }}</p>
-
-
 
     @if (resultado(); as res) {
       @if (res.itens.length > 0) {
@@ -1053,6 +1074,45 @@
       </table>
 
       <p class="print-total-final">Total: {{ res.total_geral.total?.brl ?? '—' }}</p>
+
+      @if (itcmdEstimado(); as itcmd) {
+        <h2>Estimativa de ITCMD</h2>
+        <p style="font-size: 15px; margin: 0 0 4px">
+          Alíquota de {{ itcmd.aliquotaPct }} — estimativa: <strong>{{ itcmd.valor }}</strong>
+        </p>
+        <p style="font-size: 10px; color: #8a8478; margin: 0 0 10px">
+          Não incluído no total dos emolumentos. Alíquota fixa (art. 22 da Lei 18.573/2015), sem
+          faixa por valor e sem consideração de isenções (art. 11). Se houver mais de um bem, o
+          usufruto é considerado igual para todos. Consulte a SEFA-PR.
+        </p>
+        <div
+          style="
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: #fdf6ee4b;
+            border: 1px solid #e8d9c0;
+            border-radius: 8px;
+          "
+        >
+          <p
+            style="
+              font-size: 11px;
+              color: #9a5a1f;
+              margin: 0 0 2px;
+              text-transform: uppercase;
+              letter-spacing: 0.03em;
+            "
+          >
+            Valor total aproximado
+          </p>
+          <p style="font-size: 20px; font-weight: 700; color: #9a5a1f; margin: 0">
+            {{ valorAproximadoTotal() }}
+          </p>
+          <p style="font-size: 9px; color: #635f56; margin: 4px 0 0">
+            (emolumentos + ITCMD estimado)
+          </p>
+        </div>
+      }
     } @else {
       <p>Nenhum cálculo processado ainda.</p>
     }

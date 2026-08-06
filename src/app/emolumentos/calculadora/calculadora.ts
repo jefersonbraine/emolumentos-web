@@ -156,6 +156,7 @@ export class Calculadora {
       entrada.itens.map((i) => ({ id: this.generateId(), desc: i.desc, baseStr: i.valor })),
     );
     this.resultado.set(null); // limpa o resultado antigo — obriga recalcular
+    this.itcmdEstimado.set(null);
     this.erro.set(null);
   }
 
@@ -254,6 +255,7 @@ export class Calculadora {
     this.service.calcular(request).subscribe({
       next: (res) => {
         this.resultado.set(res);
+        this.itcmdEstimado.set(this.calcularItcmd());
 
         if (res.itens?.length && res.itens.length > 1) {
           const valorNumerico = (item: CalculoItemUI) =>
@@ -475,4 +477,46 @@ export class Calculadora {
   }
 
   nomeCliente = signal('');
+
+  // LIMITAÇÃO CONHECIDA: o usufruto é um único flag para a escritura inteira,
+  // não por imóvel individual. Isso afeta tanto o Funrejus (dobra em todos os
+  // bens, não só nos que teriam usufruto) quanto a estimativa de ITCMD abaixo.
+  // Decisão: não implementado por falta de caso real — nunca observado em
+  // escritura real até 04/08/2026, segundo o Oficial Substituto responsável
+  // pelo projeto. Se algum dia ocorrer na prática, redesenhar `usufruto` como
+  // propriedade por item (não por Ato).
+  itcmdEstimado = signal<{ aliquotaPct: string; valor: string; comUsufruto: boolean } | null>(null);
+
+  private calcularItcmd() {
+    if (this.tipo() !== 'doacao') return null;
+
+    const valorTotal = this.itens().reduce((acc, item) => {
+      const num = parseFloat(item.baseStr.replace(/\./g, '').replace(',', '.')) || 0;
+      return acc + num;
+    }, 0);
+
+    if (valorTotal <= 0) return null;
+
+    const aliquota = this.usufruto() ? 0.02 : 0.04;
+    const valor = valorTotal * aliquota;
+
+    return {
+      aliquotaPct: this.usufruto() ? '2%' : '4%',
+      valor: valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+      comUsufruto: this.usufruto(),
+    };
+  }
+  valorAproximadoTotal = computed(() => {
+    const res = this.resultado();
+    const itcmd = this.itcmdEstimado();
+    if (!res?.total_geral?.total || !itcmd) return null;
+
+    const totalEmolumentos = parseFloat(res.total_geral.total.raw);
+    const totalItcmd = parseFloat(itcmd.valor.replace(/[R$.\s]/g, '').replace(',', '.'));
+
+    return (totalEmolumentos + totalItcmd).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    });
+  });
 }
