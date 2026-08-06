@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/jefersonbraine/emolumentos-web/main/public/banner%20-%20site.png" alt="emolumentos-web Banner" width="1920" />
+  <img src="https://raw.githubusercontent.com/jefersonbraine/emolumentos-web/main/public/banner-site.png" alt="emolumentos-web Banner" width="1920" />
 
   ![Deployed on Vercel](https://img.shields.io/badge/deployed-Vercel-000000?logo=vercel)
   ![Angular](https://img.shields.io/badge/Angular-standalone-DD0031?logo=angular)
