@@ -5,6 +5,7 @@ export type TipoAto =
 export interface CalculoRequest {
   tipo: TipoAto;
   valores: string[];
+  meacao?: boolean;
   usufruto?: boolean;
   partes_adicionais?: number;
 }

@@ -195,6 +195,30 @@
         </div>
       }
 
+      @if (mostraMeacao()) {
+        <div>
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 11px;
+              cursor: pointer;
+              font-size: 14.5px;
+              color: #2a2620;
+              padding-bottom: 14px;
+            "
+          >
+            <input
+              type="checkbox"
+              [(ngModel)]="meacao"
+              (change)="erro.set(null)"
+              style="width: 18px; height: 18px; accent-color: #1a1a1a; cursor: pointer"
+            />
+            Tem meação (bens do casal)
+          </label>
+        </div>
+      }
+
       @if (mostraPartes()) {
         <div style="width: 200px">
           <label
@@ -903,6 +927,14 @@
               à época.
             </p>
           }
+          @if (itcmd.comMeacao) {
+            <p class="itcmd-nota">
+              Estimativa considera a isenção da meação do cônjuge sobrevivente: a metade do bem que
+              já lhe pertence não é objeto de transmissão, logo fora da base de cálculo (art. 38 do
+              CTN). Não substitui a análise do regime de bens e da situação sucessória específica.
+            </p>
+          }
+
           <p class="itcmd-disclaimer">
             Alíquota fixa vigente (art. 22 da Lei 18.573/2015), sem faixa por valor. Não considera
             isenções do art. 11 (ex.: único imóvel residencial, imóvel rural para subsistência
