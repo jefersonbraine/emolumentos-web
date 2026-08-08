@@ -71,6 +71,9 @@ export class Calculadora {
       if (params['usufruto'] === '1') {
         this.usufruto.set(true);
       }
+      if (params['meacao'] === '1') {
+        this.meacao.set(true);
+      }
       if (params['partes']) {
         this.partesAdicionais.set(Number(params['partes']) || 0);
       }
@@ -92,6 +95,10 @@ export class Calculadora {
 
     if (this.mostraUsufruto() && this.usufruto()) {
       params.set('usufruto', '1');
+    }
+
+    if (this.mostraMeacao() && this.meacao()) {
+      params.set('meacao', '1');
     }
 
     if (this.mostraPartes() && this.partesAdicionais() > 0) {
@@ -174,6 +181,7 @@ export class Calculadora {
   tipo = signal<TipoAto>('compra_e_venda');
   itens = signal<CalculoItemUI[]>([{ id: this.generateId(), desc: 'Imóvel 1', baseStr: '' }]);
   usufruto = signal<boolean>(false);
+  meacao = signal<boolean>(false);
   partesAdicionais = signal<number>(0);
 
   // --- SINAIS DE ESTADO ---
@@ -187,6 +195,7 @@ export class Calculadora {
     ['compra_e_venda', 'doacao', 'partilha', 'cessao_direitos'].includes(this.tipo()),
   );
   mostraUsufruto = computed(() => this.tipo() === 'doacao');
+  mostraMeacao = computed(() => this.tipo() === 'partilha');
   mostraPartes = computed(() => this.tipo() === 'procuracao');
 
   // --- MANIPULAÇÃO DA UI ---
@@ -249,13 +258,20 @@ export class Calculadora {
       valores: valoresProcessados,
     };
 
+    if (this.mostraMeacao()) request.meacao = this.meacao();
     if (this.mostraUsufruto()) request.usufruto = this.usufruto();
     if (this.mostraPartes()) request.partes_adicionais = this.partesAdicionais();
 
     this.service.calcular(request).subscribe({
       next: (res) => {
         this.resultado.set(res);
-        this.itcmdEstimado.set(this.calcularItcmd());
+        if (this.tipo() === 'doacao') {
+          this.itcmdEstimado.set(this.calcularItcmdDoacao());
+        } else if (this.tipo() === 'partilha') {
+          this.itcmdEstimado.set(this.calcularItcmdMeacao());
+        } else {
+          this.itcmdEstimado.set(null);
+        }
 
         if (res.itens?.length && res.itens.length > 1) {
           const valorNumerico = (item: CalculoItemUI) =>
@@ -485,9 +501,14 @@ export class Calculadora {
   // escritura real até 04/08/2026, segundo o Oficial Substituto responsável
   // pelo projeto. Se algum dia ocorrer na prática, redesenhar `usufruto` como
   // propriedade por item (não por Ato).
-  itcmdEstimado = signal<{ aliquotaPct: string; valor: string; comUsufruto: boolean } | null>(null);
+  itcmdEstimado = signal<{
+    aliquotaPct: string;
+    valor: string;
+    comUsufruto?: boolean;
+    comMeacao?: boolean;
+  } | null>(null);
 
-  private calcularItcmd() {
+  private calcularItcmdDoacao() {
     if (this.tipo() !== 'doacao') return null;
 
     const valorTotal = this.itens().reduce((acc, item) => {
@@ -504,6 +525,33 @@ export class Calculadora {
       aliquotaPct: this.usufruto() ? '2%' : '4%',
       valor: valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
       comUsufruto: this.usufruto(),
+    };
+  }
+
+  private calcularItcmdMeacao() {
+    if (this.tipo() !== 'partilha') return null;
+
+    const valorTotal = this.itens().reduce((acc, item) => {
+      const num = parseFloat(item.baseStr.replace(/\./g, '').replace(',', '.')) || 0;
+      return acc + num;
+    }, 0);
+
+    if (valorTotal <= 0) return null;
+
+    // Alíquota sempre 4% (art. 22 da Lei 18.573/2015). Com meação, a base é
+    // reduzida à metade: a meação do cônjuge sobrevivente é patrimônio próprio
+    // dele, adquirido em vida pelo regime de bens — não há transmissão sobre
+    // essa metade (art. 38 do CTN: a base de cálculo é o valor do bem
+    // TRANSMITIDO), logo sem fato gerador ali. Jurisprudência: TJ-SP, Apelação
+    // 51.2022.8.26.0053; TJ-MS, Remessa Necessária 95.2015.8.12.0001.
+
+    const base = this.meacao() ? valorTotal / 2 : valorTotal;
+    const valor = base * 0.04;
+
+    return {
+      aliquotaPct: '4%',
+      valor: valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+      comMeacao: this.meacao(),
     };
   }
   valorAproximadoTotal = computed(() => {
