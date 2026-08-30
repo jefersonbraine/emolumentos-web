@@ -627,6 +627,44 @@
           </div>
         }
 
+        @if (mostraDetalheUsufruto()) {
+          <div class="usufruto-detalhe">
+            <p class="usufruto-detalhe-titulo">Detalhamento por ato (doação com usufruto)</p>
+            <table class="usufruto-detalhe-tabela">
+              <thead>
+                <tr>
+                  <th>Ato</th>
+                  <th>Valor Base</th>
+                  <th>Emolumentos</th>
+                  <th>Funrejus</th>
+                  <th>Selo</th>
+                  <th>Distribuidor</th>
+                  <th>FUNDEP</th>
+                  <th>ISSQN</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of resultado()!.itens; track item.descricao) {
+                  <tr>
+                    <td>{{ item.descricao }}</td>
+                    <td>{{ item.valor_base?.brl }}</td>
+                    <td>{{ item.emolumentos?.brl }}</td>
+                    <td>{{ item.funrejus?.brl }}</td>
+                    <td>{{ item.selo?.brl }}</td>
+                    <td>{{ item.distribuidor?.brl }}</td>
+                    <td>{{ item.fundep?.brl }}</td>
+                    <td>{{ item.issqn?.brl }}</td>
+                    <td>
+                      <strong>{{ item.total?.brl }}</strong>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
         <p
           data-noprint
           style="margin: 12px 2px 0; font-size: 12.5px; color: #a49e92; line-height: 1.5"
