@@ -198,6 +198,11 @@ export class Calculadora {
   mostraMeacao = computed(() => this.tipo() === 'partilha');
   mostraPartes = computed(() => this.tipo() === 'procuracao');
 
+  mostraDetalheUsufruto = computed(() => {
+    const res = this.resultado();
+    return this.tipo() === 'doacao' && this.usufruto() && (res?.itens?.length ?? 0) === 2;
+  });
+
   // --- MANIPULAÇÃO DA UI ---
   adicionarItem() {
     this.itens.update((itensAtual) => [
@@ -285,7 +290,8 @@ export class Calculadora {
         this.carregando.set(false);
       },
       error: (err) => {
-        this.erro.set(`Erro ${err.status}: ${JSON.stringify(err.error)}`);
+        const detalhe = err.error?.detail;
+        this.erro.set(detalhe ? detalhe : `Erro ${err.status}: ${JSON.stringify(err.error)}`);
         this.carregando.set(false);
       },
     });
